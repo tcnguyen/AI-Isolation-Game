@@ -35,7 +35,8 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    return len(game.get_legal_moves(player))
+
 
 
 def custom_score_2(game, player):
@@ -212,8 +213,51 @@ class MinimaxPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        player = game.active_player
+
+        legal_moves = game.get_legal_moves()
+        if len(legal_moves) > 0:
+            nodes = [(move, self.min_value(game.forecast_move(move), depth-1, player)) for move in legal_moves]
+            best_node = max(nodes, key = lambda x: x[1])
+            return best_node[0]
+        else:
+            return (-1, -1)
+
+
+
+
+    def max_value(self, game, depth, player):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth == 0:
+            return self.score(game, player)
+        else:
+            legal_moves = game.get_legal_moves()
+            value = float('-inf')
+            for move in legal_moves:
+                new_game = game.forecast_move(move)
+                value = max(value, self.min_value(new_game, depth-1, player))
+
+            return value
+
+    def min_value(self, game, depth, player):
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+
+        if depth == 0:
+            return self.score(game, player)
+        else:
+            legal_moves = game.get_legal_moves()
+            value = float('inf')
+            for move in legal_moves:
+                new_game = game.forecast_move(move)
+                value = min(value, self.max_value(new_game, depth-1, player))
+
+            return value
+
+
+
 
 
 class AlphaBetaPlayer(IsolationPlayer):
