@@ -88,7 +88,7 @@ def custom_score_3(game, player):
         The heuristic value of the current game state to the specified player.
     """
     # TODO: finish this function!
-    raise NotImplementedError
+    return (len(game.get_legal_moves(player)) - 2*len(game.get_legal_moves(game.get_opponent(player)))) * 1.0
 
 
 class IsolationPlayer:
@@ -303,13 +303,22 @@ class AlphaBetaPlayer(IsolationPlayer):
         # in case the search fails due to timeout
         best_move = (-1, -1)
 
-        try:
-            # The try/except block will automatically catch the exception
-            # raised when the timer is about to expire.
-            return self.alphabeta(game, self.search_depth)
+        depth = 1
 
-        except SearchTimeout:
-            pass  # Handle any actions required after timeout as needed
+        while True:
+            try:
+                # The try/except block will automatically catch the exception
+                # raised when the timer is about to expire.
+                best_move = self.alphabeta(game, depth)
+
+                # save the success depth
+                self.search_depth = depth
+
+                #increase depth
+                depth += 1
+
+            except SearchTimeout:
+                break  # Handle any actions required after timeout as needed
 
         # Return the best move from the last completed search iteration
         return best_move
